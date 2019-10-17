@@ -1,0 +1,164 @@
+# Policy "identity:get_credential":"rule:admin_required" was deprecated in S in favor of "identity:get_credential":"(role:reader and system_scope:all) or user_id:%(target.credential.user_id)s".
+"identity:get_credential": "(role:reader and system_scope:all) or user_id:%(target.credential.user_id)s"
+# Policy "identity:list_credentials":"rule:admin_required" was deprecated in S in favor of "identity:list_credentials":"(role:reader and system_scope:all) or user_id:%(target.credential.user_id)s".
+"identity:list_credentials": "(role:reader and system_scope:all) or user_id:%(target.credential.user_id)s"
+# Policy "identity:create_credential":"rule:admin_required" was deprecated in S in favor of "identity:create_credential":"(role:admin and system_scope:all) or user_id:%(target.credential.user_id)s".
+"identity:create_credential": "(role:admin and system_scope:all) or user_id:%(target.credential.user_id)s"
+# Policy "identity:update_credential":"rule:admin_required" was deprecated in S in favor of "identity:update_credential":"(role:admin and system_scope:all) or user_id:%(target.credential.user_id)s".
+"identity:update_credential": "(role:admin and system_scope:all) or user_id:%(target.credential.user_id)s"
+# Policy "identity:delete_credential":"rule:admin_required" was deprecated in S in favor of "identity:delete_credential":"(role:admin and system_scope:all) or user_id:%(target.credential.user_id)s".
+"identity:delete_credential": "(role:admin and system_scope:all) or user_id:%(target.credential.user_id)s"
+# Policy "identity:get_domain":"rule:admin_required or token.project.domain.id:%(target.domain.id)s" was deprecated in S in favor of "identity:get_domain":"(role:reader and system_scope:all) or token.domain.id:%(target.domain.id)s or token.project.domain.id:%(target.domain.id)s".
+"identity:get_domain": "(role:reader and system_scope:all) or token.domain.id:%(target.domain.id)s or token.project.domain.id:%(target.domain.id)s"
+# Policy "identity:list_domains":"rule:admin_required" was deprecated in S in favor of "identity:list_domains":"role:reader and system_scope:all".
+"identity:list_domains": "role:reader and system_scope:all"
+# Policy "identity:create_domain":"rule:admin_required" was deprecated in S in favor of "identity:create_domain":"role:admin and system_scope:all".
+"identity:create_domain": "role:admin and system_scope:all"
+# Policy "identity:update_domain":"rule:admin_required" was deprecated in S in favor of "identity:update_domain":"role:admin and system_scope:all".
+"identity:update_domain": "role:admin and system_scope:all"
+# Policy "identity:delete_domain":"rule:admin_required" was deprecated in S in favor of "identity:delete_domain":"role:admin and system_scope:all".
+"identity:delete_domain": "role:admin and system_scope:all"
+# Policy "identity:get_endpoint":"rule:admin_required" was deprecated in S in favor of "identity:get_endpoint":"role:reader and system_scope:all".
+"identity:get_endpoint": "role:reader and system_scope:all"
+# Policy "identity:list_endpoints":"rule:admin_required" was deprecated in S in favor of "identity:list_endpoints":"role:reader and system_scope:all".
+"identity:list_endpoints": "role:reader and system_scope:all"
+# Policy "identity:create_endpoint":"rule:admin_required" was deprecated in S in favor of "identity:create_endpoint":"role:admin and system_scope:all".
+"identity:create_endpoint": "role:admin and system_scope:all"
+# Policy "identity:update_endpoint":"rule:admin_required" was deprecated in S in favor of "identity:update_endpoint":"role:admin and system_scope:all".
+"identity:update_endpoint": "role:admin and system_scope:all"
+# Policy "identity:delete_endpoint":"rule:admin_required" was deprecated in S in favor of "identity:delete_endpoint":"role:admin and system_scope:all".
+"identity:delete_endpoint": "role:admin and system_scope:all"
+# Policy "identity:check_grant":"rule:admin_required" was deprecated in S in favor of "identity:check_grant":"role:reader and system_scope:all".
+"identity:check_grant": "role:reader and system_scope:all"
+# Policy "identity:list_grants":"rule:admin_required" was deprecated in S in favor of "identity:list_grants":"role:reader and system_scope:all".
+"identity:list_grants": "role:reader and system_scope:all"
+# Policy "identity:create_grant":"rule:admin_required" was deprecated in S in favor of "identity:create_grant":"role:admin and system_scope:all".
+"identity:create_grant": "role:admin and system_scope:all"
+# Policy "identity:revoke_grant":"rule:admin_required" was deprecated in S in favor of "identity:revoke_grant":"role:admin and system_scope:all".
+"identity:revoke_grant": "role:admin and system_scope:all"
+# Policy "identity:list_system_grants_for_user":"rule:admin_required" was deprecated in S in favor of "identity:list_system_grants_for_user":"role:reader and system_scope:all".
+"identity:list_system_grants_for_user": "role:reader and system_scope:all"
+# Policy "identity:check_system_grant_for_user":"rule:admin_required" was deprecated in S in favor of "identity:check_system_grant_for_user":"role:reader and system_scope:all".
+"identity:check_system_grant_for_user": "role:reader and system_scope:all"
+# Policy "identity:create_system_grant_for_user":"rule:admin_required" was deprecated in S in favor of "identity:create_system_grant_for_user":"role:admin and system_scope:all".
+"identity:create_system_grant_for_user": "role:admin and system_scope:all"
+# Policy "identity:revoke_system_grant_for_user":"rule:admin_required" was deprecated in S in favor of "identity:revoke_system_grant_for_user":"role:admin and system_scope:all".
+"identity:revoke_system_grant_for_user": "role:admin and system_scope:all"
+# Policy "identity:list_system_grants_for_group":"rule:admin_required" was deprecated in S in favor of "identity:list_system_grants_for_group":"role:reader and system_scope:all".
+"identity:list_system_grants_for_group": "role:reader and system_scope:all"
+# Policy "identity:check_system_grant_for_group":"rule:admin_required" was deprecated in S in favor of "identity:check_system_grant_for_group":"role:reader and system_scope:all".
+"identity:check_system_grant_for_group": "role:reader and system_scope:all"
+# Policy "identity:create_system_grant_for_group":"rule:admin_required" was deprecated in S in favor of "identity:create_system_grant_for_group":"role:admin and system_scope:all".
+"identity:create_system_grant_for_group": "role:admin and system_scope:all"
+# Policy "identity:revoke_system_grant_for_group":"rule:admin_required" was deprecated in S in favor of "identity:revoke_system_grant_for_group":"role:admin and system_scope:all".
+"identity:revoke_system_grant_for_group": "role:admin and system_scope:all"
+# Policy "identity:get_group":"rule:admin_required" was deprecated in S in favor of "identity:get_group":"(role:reader and system_scope:all) or (role:reader and domain_id:%(target.group.domain_id)s)".
+"identity:get_group": "(role:reader and system_scope:all) or (role:reader and domain_id:%(target.group.domain_id)s)"
+# Policy "identity:list_groups":"rule:admin_required" was deprecated in S in favor of "identity:list_groups":"(role:reader and system_scope:all) or (role:reader and domain_id:%(target.group.domain_id)s)".
+"identity:list_groups": "(role:reader and system_scope:all) or (role:reader and domain_id:%(target.group.domain_id)s)"
+# Policy "identity:list_groups_for_user":"rule:admin_or_owner" was deprecated in S in favor of "identity:list_groups_for_user":"(role:reader and system_scope:all) or (role:reader and domain_id:%(target.user.domain_id)s) or user_id:%(user_id)s".
+"identity:list_groups_for_user": "(role:reader and system_scope:all) or (role:reader and domain_id:%(target.user.domain_id)s) or user_id:%(user_id)s"
+# Policy "identity:create_group":"rule:admin_required" was deprecated in S in favor of "identity:create_group":"(role:admin and system_scope:all) or (role:admin and domain_id:%(target.group.domain_id)s)".
+"identity:create_group": "(role:admin and system_scope:all) or (role:admin and domain_id:%(target.group.domain_id)s)"
+# Policy "identity:update_group":"rule:admin_required" was deprecated in S in favor of "identity:update_group":"(role:admin and system_scope:all) or (role:admin and domain_id:%(target.group.domain_id)s)".
+"identity:update_group": "(role:admin and system_scope:all) or (role:admin and domain_id:%(target.group.domain_id)s)"
+# Policy "identity:delete_group":"rule:admin_required" was deprecated in S in favor of "identity:delete_group":"(role:admin and system_scope:all) or (role:admin and domain_id:%(target.group.domain_id)s)".
+"identity:delete_group": "(role:admin and system_scope:all) or (role:admin and domain_id:%(target.group.domain_id)s)"
+# Policy "identity:list_users_in_group":"rule:admin_required" was deprecated in S in favor of "identity:list_users_in_group":"(role:reader and system_scope:all) or (role:reader and domain_id:%(target.group.domain_id)s)".
+"identity:list_users_in_group": "(role:reader and system_scope:all) or (role:reader and domain_id:%(target.group.domain_id)s)"
+# Policy "identity:remove_user_from_group":"rule:admin_required" was deprecated in S in favor of "identity:remove_user_from_group":"(role:admin and system_scope:all) or (role:admin and domain_id:%(target.group.domain_id)s and domain_id:%(target.user.domain_id)s)".
+"identity:remove_user_from_group": "(role:admin and system_scope:all) or (role:admin and domain_id:%(target.group.domain_id)s and domain_id:%(target.user.domain_id)s)"
+# Policy "identity:check_user_in_group":"rule:admin_required" was deprecated in S in favor of "identity:check_user_in_group":"(role:reader and system_scope:all) or (role:reader and domain_id:%(target.group.domain_id)s and domain_id:%(target.user.domain_id)s)".
+"identity:check_user_in_group": "(role:reader and system_scope:all) or (role:reader and domain_id:%(target.group.domain_id)s and domain_id:%(target.user.domain_id)s)"
+# Policy "identity:add_user_to_group":"rule:admin_required" was deprecated in S in favor of "identity:add_user_to_group":"(role:admin and system_scope:all) or (role:admin and domain_id:%(target.group.domain_id)s and domain_id:%(target.user.domain_id)s)".
+"identity:add_user_to_group": "(role:admin and system_scope:all) or (role:admin and domain_id:%(target.group.domain_id)s and domain_id:%(target.user.domain_id)s)"
+# Policy "identity:create_identity_providers":"rule:admin_required" was deprecated in S in favor of "identity:create_identity_provider":"role:admin and system_scope:all".
+"identity:create_identity_provider": "role:admin and system_scope:all"
+# Policy "identity:list_identity_providers":"rule:admin_required" was deprecated in S in favor of "identity:list_identity_providers":"role:reader and system_scope:all".
+"identity:list_identity_providers": "role:reader and system_scope:all"
+# Policy "identity:get_identity_providers":"rule:admin_required" was deprecated in S in favor of "identity:get_identity_provider":"role:reader and system_scope:all".
+"identity:get_identity_provider": "role:reader and system_scope:all"
+# Policy "identity:update_identity_providers":"rule:admin_required" was deprecated in S in favor of "identity:update_identity_provider":"role:admin and system_scope:all".
+"identity:update_identity_provider": "role:admin and system_scope:all"
+# Policy "identity:delete_identity_providers":"rule:admin_required" was deprecated in S in favor of "identity:delete_identity_provider":"role:admin and system_scope:all".
+"identity:delete_identity_provider": "role:admin and system_scope:all"
+# Policy "identity:create_mapping":"rule:admin_required" was deprecated in S in favor of "identity:create_mapping":"role:admin and system_scope:all".
+"identity:create_mapping": "role:admin and system_scope:all"
+# Policy "identity:get_mapping":"rule:admin_required" was deprecated in S in favor of "identity:get_mapping":"role:reader and system_scope:all".
+"identity:get_mapping": "role:reader and system_scope:all"
+# Policy "identity:get_mapping":"rule:admin_required" was deprecated in S in favor of "identity:list_mappings":"role:reader and system_scope:all".
+"identity:list_mappings": "role:reader and system_scope:all"
+# Policy "identity:delete_mapping":"rule:admin_required" was deprecated in S in favor of "identity:delete_mapping":"role:admin and system_scope:all".
+"identity:delete_mapping": "role:admin and system_scope:all"
+# Policy "identity:update_mapping":"rule:admin_required" was deprecated in S in favor of "identity:update_mapping":"role:admin and system_scope:all".
+"identity:update_mapping": "role:admin and system_scope:all"
+# Policy "identity:get_project":"rule:admin_required or project_id:%(target.project.id)s" was deprecated in S in favor of "identity:get_project":"(role:reader and system_scope:all) or (role:reader and domain_id:%(target.project.domain_id)s) or project_id:%(target.project.id)s".
+"identity:get_project": "(role:reader and system_scope:all) or (role:reader and domain_id:%(target.project.domain_id)s) or project_id:%(target.project.id)s"
+# Policy "identity:list_projects":"rule:admin_required" was deprecated in S in favor of "identity:list_projects":"(role:reader and system_scope:all) or (role:reader and domain_id:%(target.domain_id)s)".
+"identity:list_projects": "(role:reader and system_scope:all) or (role:reader and domain_id:%(target.domain_id)s)"
+# Policy "identity:list_user_projects":"rule:admin_or_owner" was deprecated in S in favor of "identity:list_user_projects":"(role:reader and system_scope:all) or (role:reader and domain_id:%(target.user.domain_id)s) or user_id:%(target.user.id)s".
+"identity:list_user_projects": "(role:reader and system_scope:all) or (role:reader and domain_id:%(target.user.domain_id)s) or user_id:%(target.user.id)s"
+# Policy "identity:create_project":"rule:admin_required" was deprecated in S in favor of "identity:create_project":"(role:admin and system_scope:all) or (role:admin and domain_id:%(target.project.domain_id)s)".
+"identity:create_project": "(role:admin and system_scope:all) or (role:admin and domain_id:%(target.project.domain_id)s)"
+# Policy "identity:update_project":"rule:admin_required" was deprecated in S in favor of "identity:update_project":"(role:admin and system_scope:all) or (role:admin and domain_id:%(target.project.domain_id)s)".
+"identity:update_project": "(role:admin and system_scope:all) or (role:admin and domain_id:%(target.project.domain_id)s)"
+# Policy "identity:delete_project":"rule:admin_required" was deprecated in S in favor of "identity:delete_project":"(role:admin and system_scope:all) or (role:admin and domain_id:%(target.project.domain_id)s)".
+"identity:delete_project": "(role:admin and system_scope:all) or (role:admin and domain_id:%(target.project.domain_id)s)"
+# Policy "identity:create_protocol":"rule:admin_required" was deprecated in S in favor of "identity:create_protocol":"role:admin and system_scope:all".
+"identity:create_protocol": "role:admin and system_scope:all"
+# Policy "identity:update_protocol":"rule:admin_required" was deprecated in S in favor of "identity:update_protocol":"role:admin and system_scope:all".
+"identity:update_protocol": "role:admin and system_scope:all"
+# Policy "identity:get_protocol":"rule:admin_required" was deprecated in S in favor of "identity:get_protocol":"role:reader and system_scope:all".
+"identity:get_protocol": "role:reader and system_scope:all"
+# Policy "identity:list_protocols":"rule:admin_required" was deprecated in S in favor of "identity:list_protocols":"role:reader and system_scope:all".
+"identity:list_protocols": "role:reader and system_scope:all"
+# Policy "identity:delete_protocol":"rule:admin_required" was deprecated in S in favor of "identity:delete_protocol":"role:admin and system_scope:all".
+"identity:delete_protocol": "role:admin and system_scope:all"
+# Policy "identity:create_region":"rule:admin_required" was deprecated in S in favor of "identity:create_region":"role:admin and system_scope:all".
+"identity:create_region": "role:admin and system_scope:all"
+# Policy "identity:update_region":"rule:admin_required" was deprecated in S in favor of "identity:update_region":"role:admin and system_scope:all".
+"identity:update_region": "role:admin and system_scope:all"
+# Policy "identity:delete_region":"rule:admin_required" was deprecated in S in favor of "identity:delete_region":"role:admin and system_scope:all".
+"identity:delete_region": "role:admin and system_scope:all"
+# Policy "identity:get_role":"rule:admin_required" was deprecated in S in favor of "identity:get_role":"role:reader and system_scope:all".
+"identity:get_role": "role:reader and system_scope:all"
+# Policy "identity:list_roles":"rule:admin_required" was deprecated in S in favor of "identity:list_roles":"role:reader and system_scope:all".
+"identity:list_roles": "role:reader and system_scope:all"
+# Policy "identity:create_role":"rule:admin_required" was deprecated in S in favor of "identity:create_role":"role:admin and system_scope:all".
+"identity:create_role": "role:admin and system_scope:all"
+# Policy "identity:update_role":"rule:admin_required" was deprecated in S in favor of "identity:update_role":"role:admin and system_scope:all".
+"identity:update_role": "role:admin and system_scope:all"
+# Policy "identity:delete_role":"rule:admin_required" was deprecated in S in favor of "identity:delete_role":"role:admin and system_scope:all".
+"identity:delete_role": "role:admin and system_scope:all"
+# Policy "identity:list_role_assignments":"rule:admin_required" was deprecated in S in favor of "identity:list_role_assignments":"(role:reader and system_scope:all) or (role:reader and domain_id:%(target.domain_id)s)".
+"identity:list_role_assignments": "(role:reader and system_scope:all) or (role:reader and domain_id:%(target.domain_id)s)"
+# Policy "identity:get_service":"rule:admin_required" was deprecated in S in favor of "identity:get_service":"role:reader and system_scope:all".
+"identity:get_service": "role:reader and system_scope:all"
+# Policy "identity:list_services":"rule:admin_required" was deprecated in S in favor of "identity:list_services":"role:reader and system_scope:all".
+"identity:list_services": "role:reader and system_scope:all"
+# Policy "identity:create_service":"rule:admin_required" was deprecated in S in favor of "identity:create_service":"role:admin and system_scope:all".
+"identity:create_service": "role:admin and system_scope:all"
+# Policy "identity:update_service":"rule:admin_required" was deprecated in S in favor of "identity:update_service":"role:admin and system_scope:all".
+"identity:update_service": "role:admin and system_scope:all"
+# Policy "identity:delete_service":"rule:admin_required" was deprecated in S in favor of "identity:delete_service":"role:admin and system_scope:all".
+"identity:delete_service": "role:admin and system_scope:all"
+# Policy "identity:create_service_provider":"rule:admin_required" was deprecated in S in favor of "identity:create_service_provider":"role:admin and system_scope:all".
+"identity:create_service_provider": "role:admin and system_scope:all"
+# Policy "identity:list_service_providers":"rule:admin_required" was deprecated in S in favor of "identity:list_service_providers":"role:reader and system_scope:all".
+"identity:list_service_providers": "role:reader and system_scope:all"
+# Policy "identity:get_service_provider":"rule:admin_required" was deprecated in S in favor of "identity:get_service_provider":"role:reader and system_scope:all".
+"identity:get_service_provider": "role:reader and system_scope:all"
+# Policy "identity:update_service_provider":"rule:admin_required" was deprecated in S in favor of "identity:update_service_provider":"role:admin and system_scope:all".
+"identity:update_service_provider": "role:admin and system_scope:all"
+# Policy "identity:delete_service_provider":"rule:admin_required" was deprecated in S in favor of "identity:delete_service_provider":"role:admin and system_scope:all".
+"identity:delete_service_provider": "role:admin and system_scope:all"
+# Policy "identity:get_user":"rule:admin_or_owner" was deprecated in S in favor of "identity:get_user":"(role:reader and system_scope:all) or (role:reader and token.domain.id:%(target.user.domain_id)s) or user_id:%(target.user.id)s".
+"identity:get_user": "(role:reader and system_scope:all) or (role:reader and token.domain.id:%(target.user.domain_id)s) or user_id:%(target.user.id)s"
+# Policy "identity:list_users":"rule:admin_required" was deprecated in S in favor of "identity:list_users":"(role:reader and system_scope:all) or (role:reader and domain_id:%(target.domain_id)s)".
+"identity:list_users": "(role:reader and system_scope:all) or (role:reader and domain_id:%(target.domain_id)s)"
+# Policy "identity:create_user":"rule:admin_required" was deprecated in S in favor of "identity:create_user":"(role:admin and system_scope:all) or (role:admin and token.domain.id:%(target.user.domain_id)s)".
+"identity:create_user": "(role:admin and system_scope:all) or (role:admin and token.domain.id:%(target.user.domain_id)s)"
+# Policy "identity:update_user":"rule:admin_required" was deprecated in S in favor of "identity:update_user":"(role:admin and system_scope:all) or (role:admin and token.domain.id:%(target.user.domain_id)s)".
+"identity:update_user": "(role:admin and system_scope:all) or (role:admin and token.domain.id:%(target.user.domain_id)s)"
+# Policy "identity:delete_user":"rule:admin_required" was deprecated in S in favor of "identity:delete_user":"(role:admin and system_scope:all) or (role:admin and token.domain.id:%(target.user.domain_id)s)".
+"identity:delete_user": "(role:admin and system_scope:all) or (role:admin and token.domain.id:%(target.user.domain_id)s)"
