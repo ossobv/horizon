@@ -70,3 +70,6 @@ XStatic-smart-table>=1.4.13.2 # MIT License
 XStatic-Spin>=1.2.5.2 # MIT License
 XStatic-term.js>=0.0.7.0 # MIT License
 XStatic-tv4>=1.2.7.0 # MIT
+# Optional, depending on cache:
+#django-redis>=4.10.0
+#python-memcached>=1.59
