@@ -390,3 +390,8 @@ LOCALE_PATHS = [
 # Here comes the Django settings deprecation section. Being at the very end
 # of settings.py allows it to catch the settings defined in local_settings.py
 # or inside one of local_settings.d/ snippets.
+
+# And here are sane defaults we want committed in the OSSOBV version:
+ALLOWED_HOSTS = ['*']  # we check this in ingress controller anyway
+OPENSTACK_KEYSTONE_DEFAULT_ROLE = 'user'  # user exists, but has no perms
+OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True
