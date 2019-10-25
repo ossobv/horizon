@@ -27,6 +27,7 @@ openstack_dashboard/local/*
 !openstack_dashboard/local/local_settings.d
 openstack_dashboard/local/local_settings.d/*
 !openstack_dashboard/local/local_settings.d/*.example
+!openstack_dashboard/local/local_settings.d/ossobv.py
 openstack_dashboard/test/.secret_key_store
 openstack_dashboard/test/integration_tests/horizon.conf.sample
 openstack_dashboard/test/integration_tests/local-horizon.conf

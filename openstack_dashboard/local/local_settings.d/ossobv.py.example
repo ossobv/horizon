@@ -1,0 +1,30 @@
+# Example
+DEBUG = True
+
+# Base URL
+OPENSTACK_KEYSTONE_URL = 'https://KEYSTONE/v3/'
+
+# Enable SSO
+WEBSSO_ENABLED = True
+WEBSSO_IDP_MAPPING = {
+    # KEY: (URL, TYPE)
+    'kleides.example.com': ('kleides.example.com', 'openid'),
+}
+WEBSSO_CHOICES = (('credentials', _('Keystone Credentials')),)
+WEBSSO_CHOICES += tuple(
+    (key, 'Single Sign-On: {}'.format(url))
+    for key, (url, type_) in sorted(WEBSSO_IDP_MAPPING.items()))
+WEBSSO_INITIAL_CHOICE = WEBSSO_CHOICES[0][1]  # default to credentials for now
+
+# Local-only cache, for small scale installs.
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+# vim: set syn=python:
