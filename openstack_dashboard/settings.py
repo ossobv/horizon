@@ -395,3 +395,4 @@ LOCALE_PATHS = [
 ALLOWED_HOSTS = ['*']  # we check this in ingress controller anyway
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = 'user'  # user exists, but has no perms
 OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True
+INSTALLED_APPS[0:0] = ['ossobv']

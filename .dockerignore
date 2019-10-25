@@ -1,0 +1,9 @@
+#
+/.dockerignore
+/.git/
+
+/Dockerfile
+
+*.pyc
+*.pyo
+*.swp
