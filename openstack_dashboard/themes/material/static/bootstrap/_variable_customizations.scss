@@ -2,7 +2,7 @@
 //
 //## Gray and brand colors for use across Bootstrap.
 
-$brand-primary:         #00897b;
+$brand-primary:         #f2f4ea; // #BCAE74; // OSSOBV colors
 
 // If that blue isn't desired, then consider any of these other
 //colors that are part of the Material Design Spec Color Palette
@@ -36,7 +36,7 @@ $icon-font-svg-id:        "material";
 
 // Inverted navbar
 // Inverted navbar links
-$navbar-inverse-link-color:                 #fff;
+$navbar-inverse-link-color:                 #61573b;
 $navbar-inverse-link-hover-color:           $navbar-inverse-link-color;
 
 // Inverted navbar brand label
@@ -45,6 +45,16 @@ $navbar-inverse-brand-hover-color:          $navbar-inverse-link-color;
 // Inverted Navbar toggle
 $navbar-inverse-toggle-icon-bar-bg:         $navbar-inverse-link-color;
 
+//== Links and buttons
+
+$btn-default-color:                         #61573b !default;
+$link-color:                                $btn-default-color;
+$navbar-default-color:                      $btn-default-color;
+$navbar-inverse-toggle-hover-bg:            $btn-default-color;
+$navbar-inverse-toggle-border-color:        $btn-default-color;
+$list-group-link-heading-color:             $btn-default-color;
+$kbd-bg:                                    $btn-default-color;
+$btn-primary-color:                         $btn-default-color;
 
 //== Navs
 //
