@@ -1,0 +1,15 @@
+#
+/.dockerignore
+/.git/
+
+/Dockerfile
+
+# Allow us to place some local files here.
+/_*
+
+# Ignore stuff that we're not likely to want.
+*.orig
+*.pyc
+*.pyo
+*.rej
+*.swp
