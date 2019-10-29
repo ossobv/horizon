@@ -372,6 +372,7 @@ if DEBUG:
 
 # And here are sane defaults we want committed in the OSSOBV version:
 ALLOWED_HOSTS = ['*']  # we check this in ingress controller anyway
+COMPRESS_OFFLINE = True
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = 'user'  # user exists, but has no perms
 OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True
 
