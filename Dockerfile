@@ -7,8 +7,12 @@ EXPOSE 8080
 
 # Get prerequisites
 COPY requirements.txt /tmp/
+COPY patches /tmp/patches
+COPY venvpatch /tmp/venvpatch
+
 RUN set -x && \
-    build="python3-pip" && libs="" && tools="" && \
+    build="python3-pip" && libs="" && tools="patch" && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
     apt-get -q update && \
     apt-get -qy dist-upgrade && \
     apt-get install -y $build $libs $tools && \
@@ -37,6 +41,8 @@ RUN set -x && \
       --ignore-installed \
       -c https://releases.openstack.org/constraints/upper/train \
       'django-redis>=4.10.0' && \
+    # Apply custom patches.
+    /tmp/venvpatch /tmp/patches --apply && \
     apt-get -qy remove --purge $build $tools && \
     apt-get -qy autoremove --purge && \
     apt-get clean && find /var/lib/apt/lists -delete && \

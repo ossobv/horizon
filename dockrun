@@ -5,7 +5,7 @@ time python3 /app/manage.py collectstatic --noinput -v0
 
 # Must be done when settings are available because it communicates with
 # the cache.
-time python3 /app/manage.py compress --force 2>&1 | tail -n10 >&2
+time python3 /app/manage.py compress
 
 # Start as www-data
 exec /usr/bin/uwsgi /app/uwsgi.ini
