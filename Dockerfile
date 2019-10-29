@@ -7,14 +7,19 @@ EXPOSE 8080
 
 # Get prerequisites
 COPY requirements.txt /tmp/
+COPY patches /tmp/patches
+COPY venvpatch /tmp/venvpatch
+
 RUN set -x && \
-    build="python3-pip" && libs="" && tools="" && \
+    build="python3-pip" && libs="" && tools="patch" && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
     apt-get -q update && \
     apt-get -qy dist-upgrade && \
     apt-get install -y $build $libs $tools && \
     pip3 install --no-cache-dir -U pip idna six && \
     pip3 install --no-cache-dir -r /tmp/requirements.txt && \
     pip3 install --no-cache-dir 'django-redis>=4.10.0' && \
+    /tmp/venvpatch /tmp/patches --apply && \
     pip3 freeze && \
     apt-get -qy remove --purge $build && apt-get -qy autoremove --purge && \
     apt-get clean && find /var/lib/apt/lists -delete
