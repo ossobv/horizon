@@ -393,7 +393,19 @@ LOCALE_PATHS = [
 
 # And here are sane defaults we want committed in the OSSOBV version:
 ALLOWED_HOSTS = ['*']  # we check this in ingress controller anyway
-COMPRESS_OFFLINE = True
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = 'user'  # user exists, but has no perms
 OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True
-INSTALLED_APPS[0:0] = ['ossobv']
+
+# OSSBV theming:
+AVAILABLE_THEMES = [
+    (
+        # Things break if we don't keep this in sync with the theme_path
+        'material',
+        pgettext_lazy('OSSO theme', 'Default'),
+        'themes/material'  # theme_path
+    ),
+]
+SELECTABLE_THEMES = [i[0] for i in AVAILABLE_THEMES]
+DEFAULT_THEME = SELECTABLE_THEMES[0]
+INSTALLED_APPS[0:0] = ['ossobv']  # for altering Logo images
+COMPRESS_OFFLINE = True
