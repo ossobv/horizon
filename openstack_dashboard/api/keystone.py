@@ -144,11 +144,18 @@ def keystoneclient(request, admin=False, force_scoped=False):
     """
     client_version = VERSIONS.get_active_version()
     user = request.user
-    token_id = user.token.id
+    token_id = None
 
     if settings.OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT:
         is_domain_context_specified = bool(
             request.session.get("domain_context"))
+
+        # If user is Cloud Admin (could be domain-less), there is no
+        # domain context specified, use the system scoped token.
+        if is_cloud_admin(request):
+            system_token = request.session.get('system_token')
+            if system_token:
+                token_id = getattr(system_token, 'auth_token', None)
 
         # If user is Cloud Admin, Domain Admin or Mixed Domain Admin and there
         # is no domain context specified, use domain scoped token
@@ -315,12 +322,23 @@ def get_effective_domain_id(request):
 
 
 def is_cloud_admin(request):
-    return policy.check((("identity", "cloud_admin"),), request)
+    # XXX(wdoekes): Checking the system_token makes sense, I guess. If we
+    # have system-scope, then we're superadmins.
+    # return policy.check((("identity", "cloud_admin"),), request)
+    return bool(request.session.get('system_token'))
 
 
 def is_domain_admin(request):
-    return policy.check(
-        (("identity", "admin_and_matching_domain_id"),), request)
+    # XXX(wdoekes): Sounds sane? As identity:admin_and_matching_domain_id
+    # does not exist.
+    # return policy.check(
+    #     (("identity", "admin_and_matching_domain_id"),), request)
+    ret = (
+        is_cloud_admin(request) or
+        policy.check(
+            (("identity",
+              "role:admin and domain_id:%(target.domain_id)s)"),), request))
+    return ret
 
 
 # TODO(gabriel): Is there ever a valid case for admin to be false here?

@@ -302,7 +302,7 @@ def get_token_auth_plugin(auth_url, token, project_id=None, domain_name=None,
                              token=token,
                              system_scope=system_scope,
                              reauthenticate=False)
-    if domain_name:
+    if domain_name:  # XXX(wdoekes) test/check?
         return v3_auth.Token(auth_url=auth_url,
                              token=token,
                              domain_name=domain_name,
