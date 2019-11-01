@@ -31,13 +31,13 @@ Super-useful, for instance to switch to the new scope-enforced policies
 Scope-enforced policies and policy.yaml
 --------------------------------------
 
-We can set ``[oslo_policy] enforce_scope=True`` to True, now what we
-tested behaviour with the new-style policy from ``ossobv-policy.yaml``:
+We can NOT set ``[oslo_policy] enforce_scope = true``, even though we've
+taken the new defaults from  ``ossobv-policy.yaml``:
 
 .. code-block:: inifile
 
     [oslo_policy]
-    enforce_scope = true
+    enforce_scope = false
 
 See this comment bit::
 
@@ -46,15 +46,29 @@ See this comment bit::
     # strings can be removed since that will be handled automatically by
     # scope_types in oslo.policy's RuleDefault objects.
 
+The problem is the role and the grants, for which we need domain scope::
+
+    # Because scope=['system'], we must use enforce_scope=False :-(
+    "identity:list_roles": "role:reader"
+
+    # Here, the scope is okay, but the default reader perms are not
+    # sufficient for domain admins.
+    "identity:list_grants": "(role:reader and system_scope:all) or \
+      (role:reader and token.domain.id:%(target.project.domain_id)s)"
+    "identity:create_grant": "(role:admin and system_scope:all) or \
+      (role:admin and token.domain.id:%(target.project.domain_id)s)"
+    "identity:revoke_grant": "(role:admin and system_scope:all) or \
+      (role:admin and token.domain.id:%(target.project.domain_id)s)"
+
+So, we'll have to go with the provided (new-style default) policy.xml,
+and add the above rules.
+
 Also note that the policy-file filename is also set in ``keystone.conf``:
 
 .. code-block:: inifile
 
     [oslo_policy]
     policy_file = policy.yaml
-
-But it can be empty with the ``enforce_scope`` policy set to the new
-default.
 
 
 CLI setup and Permissions
@@ -148,6 +162,28 @@ being, less powerful than readers:
 
 These implied roles have to be fixed if you happen to delete the
 existing roles.
+
+
+Domain admin conventions
+------------------------
+
+* Create domain ``acme`` and group ``acme-admins``.
+* Please every admin in the ``acme-admins`` group.
+* Create projects, and make sure all projects give ``admin`` roles to
+  the ``acme-admins`` group.
+* Make the ``acme-admins`` a group admin, using the CLI::
+
+    openstack --os-cloud sysadmin \
+      role add admin --group acme-admins --group-domain acme \
+      --domain acme
+
+* Domain admins may now be added to the ``acme-admins`` group. Giving
+  them domain admin access.
+* Now, if you want _sysadmin_ access from the Horizon dashboard to the
+  containers, you'll need to give all sysadmins permissions to the
+  ``acme-admins`` group. A bit tedious, but it works::
+
+    openstack --os-cloud sysadmin group add user acme-admins sysadmin
 
 
 Federation rules config and rules.yaml

@@ -21,11 +21,14 @@ from django.utils.http import urlencode
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext_lazy
 
+from keystoneauth1 import exceptions as keystone_exceptions
 from keystoneclient import exceptions as keystoneclient_exceptions
 
 from horizon import exceptions
 from horizon import messages
 from horizon import tables
+
+from openstack_auth import utils
 
 from openstack_dashboard import api
 
@@ -243,6 +246,18 @@ class SetDomainContext(tables.Action):
                 domain = api.keystone.domain_get(request, obj_id)
                 request.session['domain_context'] = obj_id
                 request.session['domain_context_name'] = domain.name
+
+                # Try to get a domain token for the new domain.
+                # No guarantees that we'll get it.
+                domain_auth_ref = _reget_domain_token(
+                    request.user, domain.name)
+                request.session['domain_token'] = domain_auth_ref  # or None?
+
+                # Update user token to contain the currently selected domain.
+                request.user.set_domain_context({
+                    'id': obj_id, 'name': domain.name})
+                request.session['token'] = request.user.token
+
                 messages.success(request,
                                  _('Domain Context updated to Domain %s.') %
                                  domain.name)
@@ -267,6 +282,16 @@ class UnsetDomainContext(tables.Action):
         if 'domain_context' in request.session:
             request.session.pop("domain_context")
             request.session.pop("domain_context_name")
+
+            # Go back to the user_domain.
+            domain_auth_ref = _reget_domain_token(
+                request.user, request.user.user_domain_name)
+            request.session['domain_token'] = domain_auth_ref
+
+            # Remove selected domain from the stored user token.
+            request.user.set_domain_context(None)
+            request.session['token'] = request.user.token
+
             messages.success(request, _('Domain Context cleared.'))
 
 
@@ -287,3 +312,20 @@ class DomainsTable(tables.DataTable):
                        DisableDomainsAction, DeleteDomainsAction)
         table_actions = (DomainFilterAction, CreateDomainLink,
                          DeleteDomainsAction, UnsetDomainContext)
+
+
+def _reget_domain_token(user, domain_name):
+    session = utils.get_session()
+    domain_auth = utils.get_token_auth_plugin(
+        auth_url=user.endpoint,
+        token=user.unscoped_token,
+        domain_name=domain_name)
+    try:
+        domain_auth_ref = domain_auth.get_access(session)
+    except (keystone_exceptions.ClientException,
+            keystone_exceptions.AuthorizationFailure):
+        LOG.warning(
+            'Attempted scope to domain %r failed; does not matter if '
+            'you have admin scope', domain_name)
+        return None
+    return domain_auth_ref

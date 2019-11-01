@@ -236,3 +236,27 @@ class BasePlugin(object):
                              unscoped_auth_ref.user_id, _name)
                 break
         return domain_auth, domain_auth_ref
+
+    def get_system_scoped_auth(self, unscoped_auth, unscoped_auth_ref,
+                               scope='all'):
+        session = utils.get_session()
+        auth_url = unscoped_auth.auth_url
+
+        if utils.get_keystone_version() < 3:
+            return None, None
+        if scope != 'all':
+            LOG.info('Not sure what to do here.. aborting for now', scope)
+            return None, None
+
+        token = unscoped_auth_ref.auth_token
+        system_auth = utils.get_token_auth_plugin(
+            auth_url,
+            token,
+            system_scope=scope)
+        system_auth_ref = None
+        try:
+            system_auth_ref = system_auth.get_access(session)
+        except (keystone_exceptions.ClientException,
+                keystone_exceptions.AuthorizationFailure):
+            LOG.info('Attempted system_scope %s failed', scope)
+        return system_auth, system_auth_ref
