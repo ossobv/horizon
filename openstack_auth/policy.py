@@ -132,7 +132,7 @@ def check(actions, request, target=None):
     """
     if target is None:
         target = {}
-    user = auth_utils.get_user(request)
+    user = auth_utils.middleware_get_user(request)  # get_user_from_cache
 
     # Several service policy engines default to a project id check for
     # ownership. Since the user is already scoped to a project, if a
