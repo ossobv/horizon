@@ -61,6 +61,9 @@ class IndexView(tables.DataTableView):
         else:
             msg = _("Insufficient privilege level to view domain information.")
             messages.info(self.request, msg)
+
+        domains.sort(key=(lambda x: (x.name)))
+
         return domains
 
 
