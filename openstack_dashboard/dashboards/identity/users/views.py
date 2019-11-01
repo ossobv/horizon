@@ -99,6 +99,9 @@ class IndexView(tables.DataTableView):
             domain_lookup = api.keystone.domain_lookup(self.request)
             for u in users:
                 u.domain_name = domain_lookup.get(u.domain_id)
+
+        users.sort(key=(lambda x: (x.name)))
+
         return users
 
 
