@@ -165,18 +165,25 @@ def check(actions, request, target=None):
 
     credentials = _user_to_credentials(user)
     domain_credentials = _domain_to_credentials(request, user)
-    # if there is a domain token use the domain_id instead of the user's domain
-    if domain_credentials:
-        credentials['domain_id'] = domain_credentials.get('domain_id')
+    system_credentials = _system_to_credentials(request, user)
 
     enforcer = _get_enforcer()
 
     for action in actions:
         scope, action = action[0], action[1]
         if scope in enforcer:
+            # using a system scoped token if available
+            if scope == 'identity' and system_credentials:
+                # use system credentials
+                if not _check_credentials(enforcer[scope],
+                                          action,
+                                          target,
+                                          system_credentials):
+                    return False
+
             # this is for handling the v3 policy file and will only be
             # needed when a domain scoped token is present
-            if scope == 'identity' and domain_credentials:
+            elif scope == 'identity' and domain_credentials:
                 # use domain credentials
                 if not _check_credentials(enforcer[scope],
                                           action,
@@ -185,8 +192,8 @@ def check(actions, request, target=None):
                     return False
 
             # use project credentials
-            if not _check_credentials(enforcer[scope],
-                                      action, target, credentials):
+            elif not _check_credentials(enforcer[scope],
+                                        action, target, credentials):
                 return False
 
         # if no policy for scope, allow action, underlying API will
@@ -220,7 +227,8 @@ def _user_to_credentials(user):
                              'project_id': user.project_id,
                              'tenant_id': user.project_id,
                              'project_name': user.project_name,
-                             'domain_id': user.user_domain_id,
+                             'domain_id': (
+                                 user.domain_id or user.user_domain_id),
                              'is_admin': user.is_superuser,
                              'roles': roles}
     return user._credentials
@@ -246,3 +254,22 @@ def _domain_to_credentials(request, user):
             LOG.warning("Failed to create user from domain scoped token.")
             return None
     return user._domain_credentials
+
+
+def _system_to_credentials(request, user):
+    if not hasattr(user, "_system_credentials"):
+        try:
+            system_auth_ref = request.session.get('system_token')
+
+            # no domain role or not running on V3
+            if not system_auth_ref:
+                return None
+            system_user = auth_user.create_user_from_token(
+                request, auth_user.Token(system_auth_ref),
+                system_auth_ref.service_catalog.url_for(interface=None))
+            user._system_credentials = _user_to_credentials(system_user)
+
+        except Exception:
+            LOG.warning("Failed to create user from system scoped token.")
+            return None
+    return user._system_credentials

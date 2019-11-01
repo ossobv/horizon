@@ -62,6 +62,9 @@ class KeystoneBackend(object):
         """
         if (hasattr(self, 'request') and
                 user_id == self.request.session["user_id"]):
+            # We mutate this token to include the domain_id/domain_name
+            # when we have a domain context selected, using
+            # set_domain_context().
             token = self.request.session['token']
             endpoint = self.request.session['region_endpoint']
             services_region = self.request.session['services_region']
@@ -122,7 +125,10 @@ class KeystoneBackend(object):
         # Check expiry for our unscoped auth ref.
         self._check_auth_expiry(unscoped_auth_ref)
 
+        # Default domain token scope to the user_domain domain.
         domain_name = kwargs.get('user_domain_name', None)
+        system_auth, system_auth_ref = plugin.get_system_scoped_auth(
+            unscoped_auth, unscoped_auth_ref, 'all')
         domain_auth, domain_auth_ref = plugin.get_domain_scoped_auth(
             unscoped_auth, unscoped_auth_ref, domain_name)
         scoped_auth, scoped_auth_ref = plugin.get_project_scoped_auth(
@@ -134,7 +140,9 @@ class KeystoneBackend(object):
         # The valid use cases for a user login are:
         #    Keystone v2: user must have a role on a project and be able
         #                 to obtain a project scoped token
-        #    Keystone v3: 1) user can obtain a domain scoped token (user
+        #    Keystone v3: 0) user can obtain a system scoped token
+        #                    (system_scope:all)
+        #                 1) user can obtain a domain scoped token (user
         #                    has a role on the domain they authenticated to),
         #                    only, no roles on a project
         #                 2) user can obtain a domain scoped token and has
@@ -143,12 +151,17 @@ class KeystoneBackend(object):
         #                    token)
         #                 3) user cannot obtain a domain scoped token, but can
         #                    obtain a project scoped token
+        if not domain_auth_ref and system_auth_ref:
+            # XXX(wdoekes): is this even possible? In any case, we set
+            # the domain token to None when we cannot access it.
+            domain_auth = None
+            domain_auth_ref = None
         if not scoped_auth_ref and domain_auth_ref:
             # if the user can't obtain a project scoped token, set the scoped
             # token to be the domain token, if valid
             scoped_auth = domain_auth
             scoped_auth_ref = domain_auth_ref
-        elif not scoped_auth_ref and not domain_auth_ref:
+        elif not (scoped_auth_ref or domain_auth_ref or system_auth_ref):
             msg = _('You are not authorized for any projects or domains.')
             raise exceptions.KeystoneNoProjectsException(msg)
 
@@ -176,9 +189,18 @@ class KeystoneBackend(object):
         # If we made it here we succeeded. Create our User!
         unscoped_token = unscoped_auth_ref.auth_token
 
+        token = auth_user.Token(scoped_auth_ref, unscoped_token=unscoped_token)
+        if not system_auth_ref and domain_auth_ref:
+            # We're not cloud-admin, but we're domain-admin. Give the
+            # token domain powers, as we cannot get them by switching
+            # domain ourselves.
+            token.domain.update({
+                'id': domain_auth_ref.domain_id,
+                'name': domain_auth_ref.domain_name})
+
         user = auth_user.create_user_from_token(
             request,
-            auth_user.Token(scoped_auth_ref, unscoped_token=unscoped_token),
+            token,
             endpoint,
             services_region=region_name)
 
@@ -187,7 +209,7 @@ class KeystoneBackend(object):
             utils.store_initial_k2k_session(auth_url, request, scoped_auth_ref,
                                             unscoped_auth_ref)
             request.session['unscoped_token'] = unscoped_token
-            if domain_auth_ref:
+            if domain_auth_ref or system_auth_ref:
                 # check django session engine, if using cookies, this will not
                 # work, as it will overflow the cookie so don't add domain
                 # scoped token to the session and put error in the log
@@ -198,7 +220,10 @@ class KeystoneBackend(object):
                               'perform identity operations due to cookie size '
                               'constraints.')
                 else:
-                    request.session['domain_token'] = domain_auth_ref
+                    if domain_auth_ref:
+                        request.session['domain_token'] = domain_auth_ref
+                    if system_auth_ref:
+                        request.session['system_token'] = system_auth_ref
 
             request.user = user
             timeout = settings.SESSION_TIMEOUT
