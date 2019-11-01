@@ -321,8 +321,14 @@ def clean_up_auth_url(auth_url):
         scheme, netloc, re.sub(r'/auth.*', '', path), '', ''))
 
 
-def get_token_auth_plugin(auth_url, token, project_id=None, domain_name=None):
-    if domain_name:
+def get_token_auth_plugin(auth_url, token, project_id=None, domain_name=None,
+                          system_scope=None):
+    if system_scope:
+        return v3_auth.Token(auth_url=auth_url,
+                             token=token,
+                             system_scope=system_scope,
+                             reauthenticate=False)
+    elif domain_name:
         return v3_auth.Token(auth_url=auth_url,
                              token=token,
                              domain_name=domain_name,

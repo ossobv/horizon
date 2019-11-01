@@ -54,7 +54,8 @@ def show_overview(context):
                                     context['authorized_tenants'])
 
     context = {'domain_supported': is_multidomain_supported(),
-               'domain_name': request.user.user_domain_name,
+               'domain_name': (
+                    request.user.domain_name or request.user.user_domain_name),
                'project_name': project_name or request.user.project_name,
                'multi_region': is_multi_region_configured(request),
                'region_name': request.user.services_region,
@@ -70,8 +71,10 @@ def show_domain_list(context):
     if 'request' not in context:
         return {}
     request = context['request']
-    context = {'domain_name': request.user.user_domain_name,
-               'request': request}
+    context = {
+        'domain_name': (
+            request.user.domain_name or request.user.user_domain_name),
+        'request': request}
     return context
 
 
