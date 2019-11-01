@@ -128,7 +128,7 @@ class User(models.AbstractBaseUser, models.AnonymousUser):
 
         The Keystone token object associated with the current user/tenant.
 
-        The token object is deprecated, user auth_ref instead.
+        The token object is deprecated, use auth_ref instead.
 
     .. attribute:: tenant_id
 
@@ -242,6 +242,14 @@ class User(models.AbstractBaseUser, models.AnonymousUser):
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self.username)
 
+    def set_domain_context(self, domain):
+        if domain is None:
+            domain = {'id': None, 'name': None}
+        self.domain_id = domain['id']
+        self.domain_name = domain['name']
+        self.token.domain.update(domain)    # token is the "original" source?
+        self._authorized_tenants = None     # flush project/tenant cache
+
     def is_token_expired(self, margin=None):
         """Determine if the token is expired.
 
@@ -293,8 +301,9 @@ class User(models.AbstractBaseUser, models.AnonymousUser):
         """Returns a memoized list of tenants this user may access."""
         if self.is_authenticated and self._authorized_tenants is None:
             endpoint = self.endpoint
+
             try:
-                self._authorized_tenants = utils.get_project_list(
+                authorized_tenants = utils.get_project_list(
                     user_id=self.id,
                     auth_url=endpoint,
                     token=self.unscoped_token,
@@ -302,6 +311,22 @@ class User(models.AbstractBaseUser, models.AnonymousUser):
             except (keystone_exceptions.ClientException,
                     keystone_exceptions.AuthorizationFailure):
                 LOG.exception('Unable to retrieve project list.')
+
+            # Limit results to those in the currently selected domain
+            # (user.domain_id) or user_domain if no domain is selected.
+            if self.domain_id:
+                authorized_tenants = [
+                    i for i in authorized_tenants
+                    if i.domain_id == self.domain_id]
+            else:
+                authorized_tenants = [
+                    i for i in authorized_tenants
+                    if i.domain_id == self.user_domain_id]
+
+            # Sort results.
+            authorized_tenants.sort(key=(lambda x: x.name))
+
+            self._authorized_tenants = authorized_tenants
         return self._authorized_tenants or []
 
     @authorized_tenants.setter

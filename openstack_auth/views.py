@@ -251,9 +251,14 @@ def switch(request, tenant_id, redirect_field_name=auth.REDIRECT_FIELD_NAME):
         redirect_to = settings.LOGIN_REDIRECT_URL
 
     if auth_ref:
+        token = auth_user.Token(auth_ref, unscoped_token=unscoped_token)
+        token.domain.update({
+            'id': auth_ref.project_domain_id,
+            'name': auth_ref.project_domain_name})
+
         user = auth_user.create_user_from_token(
             request,
-            auth_user.Token(auth_ref, unscoped_token=unscoped_token),
+            token,
             endpoint)
         auth_user.set_session_from_user(request, user)
         message = (
