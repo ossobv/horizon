@@ -1,3 +1,12 @@
+# Because scope=['system'], we must use enforce_scope=False :-(
+"identity:list_roles": "role:reader"
+
+# Here, the scope is okay, but the default reader perms are not
+# sufficient for domain admins.
+"identity:list_grants": "(role:reader and system_scope:all) or (role:reader and token.domain.id:%(target.project.domain_id)s)"
+"identity:create_grant": "(role:admin and system_scope:all) or (role:admin and token.domain.id:%(target.project.domain_id)s)"
+"identity:revoke_grant": "(role:admin and system_scope:all) or (role:admin and token.domain.id:%(target.project.domain_id)s)"
+
 # Policy "identity:get_credential":"rule:admin_required" was deprecated in S in favor of "identity:get_credential":"(role:reader and system_scope:all) or user_id:%(target.credential.user_id)s".
 "identity:get_credential": "(role:reader and system_scope:all) or user_id:%(target.credential.user_id)s"
 # Policy "identity:list_credentials":"rule:admin_required" was deprecated in S in favor of "identity:list_credentials":"(role:reader and system_scope:all) or user_id:%(target.credential.user_id)s".
@@ -31,11 +40,11 @@
 # Policy "identity:check_grant":"rule:admin_required" was deprecated in S in favor of "identity:check_grant":"role:reader and system_scope:all".
 "identity:check_grant": "role:reader and system_scope:all"
 # Policy "identity:list_grants":"rule:admin_required" was deprecated in S in favor of "identity:list_grants":"role:reader and system_scope:all".
-"identity:list_grants": "role:reader and system_scope:all"
+#"identity:list_grants": "role:reader and system_scope:all"
 # Policy "identity:create_grant":"rule:admin_required" was deprecated in S in favor of "identity:create_grant":"role:admin and system_scope:all".
-"identity:create_grant": "role:admin and system_scope:all"
+#"identity:create_grant": "role:admin and system_scope:all"
 # Policy "identity:revoke_grant":"rule:admin_required" was deprecated in S in favor of "identity:revoke_grant":"role:admin and system_scope:all".
-"identity:revoke_grant": "role:admin and system_scope:all"
+#"identity:revoke_grant": "role:admin and system_scope:all"
 # Policy "identity:list_system_grants_for_user":"rule:admin_required" was deprecated in S in favor of "identity:list_system_grants_for_user":"role:reader and system_scope:all".
 "identity:list_system_grants_for_user": "role:reader and system_scope:all"
 # Policy "identity:check_system_grant_for_user":"rule:admin_required" was deprecated in S in favor of "identity:check_system_grant_for_user":"role:reader and system_scope:all".
@@ -123,7 +132,7 @@
 # Policy "identity:get_role":"rule:admin_required" was deprecated in S in favor of "identity:get_role":"role:reader and system_scope:all".
 "identity:get_role": "role:reader and system_scope:all"
 # Policy "identity:list_roles":"rule:admin_required" was deprecated in S in favor of "identity:list_roles":"role:reader and system_scope:all".
-"identity:list_roles": "role:reader and system_scope:all"
+#"identity:list_roles": "role:reader and system_scope:all"
 # Policy "identity:create_role":"rule:admin_required" was deprecated in S in favor of "identity:create_role":"role:admin and system_scope:all".
 "identity:create_role": "role:admin and system_scope:all"
 # Policy "identity:update_role":"rule:admin_required" was deprecated in S in favor of "identity:update_role":"role:admin and system_scope:all".

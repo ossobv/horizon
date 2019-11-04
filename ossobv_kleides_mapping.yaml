@@ -1,0 +1,88 @@
+# Updating config:
+#
+#   openstack --os-cloud sysadmin mapping delete kleides_account_mapping
+#   openstack --os-cloud sysadmin mapping create kleides_account_mapping \
+#      --rules <(python -c 'import yaml;import json;x=open("rules.yaml").read();print(json.dumps(yaml.load(x)["rules"]))')
+#   openstack --os-cloud sysadmin mapping show kleides_account_mapping -f yaml
+#
+# Example rule input:
+#
+#   {'HTTP_OIDC_AUD': ['69xxxx'],
+#    'HTTP_OIDC_AUTH_TIME': ['1572863513'],
+#    'HTTP_OIDC_BKND': ['oidc'],
+#    'HTTP_OIDC_EMAIL': ['john.doe@example.com'],
+#    'HTTP_OIDC_EXP': ['1572867113'],
+#    'HTTP_OIDC_FAMILY_NAME': ['Doe'],
+#    'HTTP_OIDC_GIVEN_NAME': ['John'],
+#    'HTTP_OIDC_IAT': ['1572863513'],
+#    'HTTP_OIDC_ISS': ['https://KLEIDES/openid'],
+#    'HTTP_OIDC_IS_ADMIN': ['0'],
+#    'HTTP_OIDC_NAME': ['John Doe'],
+#    'HTTP_OIDC_NICKNAME': ['johndoe'],
+#    'HTTP_OIDC_NONCE': ['5xg_xxxx'],
+#    'HTTP_OIDC_ORGS': ['{"acmecorp": [1]}'],
+#    'HTTP_OIDC_PERMISSIONS': ['{}'],
+#    'HTTP_OIDC_PREFERRED_USERNAME': ['johndoe'],
+#    'HTTP_OIDC_SUB': ['john.doe@example.com'],
+#    'HTTP_OIDC_TEAMS': ['{"acmeteam": 1}']}
+#
+# Or, for admins:
+#
+#   {...,
+#    'HTTP_OIDC_IS_ADMIN': ['1'],
+#    'HTTP_OIDC_NICKNAME': ['admin'],
+#    'HTTP_OIDC_NONCE': ['AdaOxxxx'],
+#    'HTTP_OIDC_ORGS': ['{}'],
+#    'HTTP_OIDC_PERMISSIONS': ['{}'],
+#    'HTTP_OIDC_PREFERRED_USERNAME': ['admin'],
+#    'HTTP_OIDC_SUB': ['admin@example.com'],
+#    'HTTP_OIDC_TEAMS': ['{}']}
+#
+# (The above can be found in keystone debug logs.)
+#
+# (NOTE: HTTP_OIDC_EMAIL is *NOT* unique at the moment. So we cannot use that.
+# Use the HTTP_OIDC_PREFERRED_USERNAME instead.)
+# (NOTE: We're not using the Federated users as we want separately
+# configured admin/domain access. (Thus: type 'local', not 'ephemeral'.))
+#
+id: kleides_account_mapping
+rules:
+
+# SU local user (is_admin=1, email=*@example.com)
+- local:
+  - user:
+      domain: {"name": "sudomain"}
+      # not domain.name: e774xxxx (ephemeral)
+      name: "{0}"
+      type: local
+      # not: type: ephemeral
+  remote:
+  # The nth type gets placed in "{n}"
+  - type: HTTP_OIDC_PREFERRED_USERNAME
+  - {"type": "HTTP_OIDC_IS_ADMIN", "any_one_of": ["1"]}
+  - {"type": "HTTP_OIDC_EMAIL", "any_one_of": [".*@example.com$"], "regex": true}
+  # (the is_admin user may not have HTTP_OIDC_ORGS or HTTP_OIDC_PERMISSIONS)
+
+# SU local user (org=sudomain, perm=SSO-login)
+- local:
+  - user:
+      domain: {"name": "sudomain"}
+      name: "{0}"
+      type: local
+  remote:
+  - type: HTTP_OIDC_PREFERRED_USERNAME
+  - {"type": "HTTP_OIDC_PERMISSIONS", "any_one_of": ['.*"SSO-login".*'], "regex": true}
+  - {"type": "HTTP_OIDC_ORGS", "any_one_of": ['.*"sudomain".*'], "regex": true}
+  # (HTTP_OIDC_ORGS is enabled if the user has the right Team, and that
+  # team has the Keystone site enabled)
+
+# Other local user (org=other, perm=SSO-login)
+- local:
+  - user:
+      domain: {"name": "other"}
+      name: "{0}"
+      type: local
+  remote:
+  - type: HTTP_OIDC_PREFERRED_USERNAME
+  - {"type": "HTTP_OIDC_PERMISSIONS", "any_one_of": ['.*"SSO-login".*'], "regex": true}
+  - {"type": "HTTP_OIDC_ORGS", "any_one_of": ['.*"other".*'], "regex": true}

@@ -32,7 +32,7 @@ Scope-enforced policies and policy.yaml
 --------------------------------------
 
 We can NOT set ``[oslo_policy] enforce_scope = true``, even though we've
-taken the new defaults from  ``ossobv-policy.yaml``:
+taken the new defaults from  `<ossobv_policy.yaml>`_:
 
 .. code-block:: inifile
 
@@ -164,41 +164,69 @@ These implied roles have to be fixed if you happen to delete the
 existing roles.
 
 
+Creating cloud admins / superusers
+----------------------------------
+
+Give system scope to the ``sudomain-admins``, so all members get SU powers::
+
+    $ openstack --os-cloud sysadmin role assignment list --names --system=all
+    +-------+---------------+----------------------+------+-----+-----+
+    | Role  | User          | Group                | Proj | Dom | Sys |
+    +-------+---------------+----------------------+------+-----+-----+
+    | admin | admin@Default |                      |      |     | all |
+    | admin |               | sudomain-admins@acme |      |     | all |
+    +-------+---------------+----------------------+------+-----+-----+
+
+Others don't need system scope at this point.
+
+
 Domain admin conventions
 ------------------------
 
 * Create domain ``acme`` and group ``acme-admins``.
-* Please every admin in the ``acme-admins`` group.
-* Create projects, and make sure all projects give ``admin`` roles to
-  the ``acme-admins`` group.
 * Make the ``acme-admins`` a group admin, using the CLI::
 
     openstack --os-cloud sysadmin \
       role add admin --group acme-admins --group-domain acme \
       --domain acme
 
-* Domain admins may now be added to the ``acme-admins`` group. Giving
-  them domain admin access.
-* Now, if you want _sysadmin_ access from the Horizon dashboard to the
+    # see: contrib/oio-openstack dagroup-assign
+
+* Now, if you want *sysadmin* access from the Horizon dashboard to the
   containers, you'll need to give all sysadmins permissions to the
-  ``acme-admins`` group. A bit tedious, but it works::
+  ``acme-admins`` group::
 
-    openstack --os-cloud sysadmin group add user acme-admins sysadmin
+    for su in sysadmin1 sysadmin2 sysadmin3; do
+      openstack --os-cloud sysadmin group add user acme-admins $su
+    done
+
+    # see: contrib/oio-openstack dagroup-assign-su
+
+* Users from the new domain can now be made domain admin by adding them
+  to the ``acme-admins`` group.
+* When creating projects in the ``acme`` domain, make sure all projects
+  assign ``admin`` role to the ``acme-admins`` group.
 
 
-Federation rules config and rules.yaml
---------------------------------------
+Federation/IDP/OIDC and user mapping
+------------------------------------
 
-FIXME. See also: ossobv-rules.yaml
+We don't use Federated users, as granting permissions to outside the
+Federated domain did not work as we would like. Using type=local users
+instead.
 
-FIXME. Define/document ephemeral vs. local fixes/troubles.
+Adding domains/users to Kleides:
 
-FIXME. Document rules checking/examples.
+* See the eample user mapping config in: `<ossobv_kleides_mapping.yaml>`_
+* Wipe passwords of Kleides users so they cannot log in the regular way::
+
+    openstack --os-cloud sysadmin user set johndoe --password ''
+
+* Add appropriate Team to user, and the right SSO-login perms.
 
 
 Upgrading keystone
 ------------------
 
-First: database backup
-
-Then: ``keystone-manage db_sync``
+1. database backup
+2. ``keystone-manage db_sync``
