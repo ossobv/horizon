@@ -32,7 +32,7 @@ Scope-enforced policies and policy.yaml
 --------------------------------------
 
 We can NOT set ``[oslo_policy] enforce_scope = true``, even though we've
-taken the new defaults from  ``ossobv-policy.yaml``:
+taken the new defaults from  `<ossobv_policy.yaml>`_:
 
 .. code-block:: inifile
 
@@ -168,7 +168,7 @@ Domain admin conventions
 ------------------------
 
 * Create domain ``acme`` and group ``acme-admins``.
-* Please every admin in the ``acme-admins`` group.
+* Place every admin in the ``acme-admins`` group.
 * Create projects, and make sure all projects give ``admin`` roles to
   the ``acme-admins`` group.
 * Make the ``acme-admins`` a group admin, using the CLI::
@@ -179,26 +179,65 @@ Domain admin conventions
 
 * Domain admins may now be added to the ``acme-admins`` group. Giving
   them domain admin access.
-* Now, if you want _sysadmin_ access from the Horizon dashboard to the
+* Now, if you want *sysadmin* access from the Horizon dashboard to the
   containers, you'll need to give all sysadmins permissions to the
   ``acme-admins`` group. A bit tedious, but it works::
 
     openstack --os-cloud sysadmin group add user acme-admins sysadmin
 
+* Give system scope to the ``sudomain-admins``, so all members get SU powers::
 
-Federation rules config and rules.yaml
---------------------------------------
+    $ openstack --os-cloud sysadmin role assignment list --names --system=all
+    +-------+---------------+----------------------+------+-----+-----+
+    | Role  | User          | Group                | Proj | Dom | Sys |
+    +-------+---------------+----------------------+------+-----+-----+
+    | admin | admin@Default |                      |      |     | all |
+    | admin |               | sudomain-admins@acme |      |     | all |
+    +-------+---------------+----------------------+------+-----+-----+
 
-FIXME. See also: ossobv-rules.yaml
 
-FIXME. Define/document ephemeral vs. local fixes/troubles.
+Creating superusers
+-------------------
 
-FIXME. Document rules checking/examples.
+Use this script to create users that can access all projects::
+
+    #!/bin/sh -e
+    ( test -z "$1" || test -z "$2" || test -z "$3" ) &&
+        echo "Usage: $0 SU_USERNAME SU_EMAIL SU_DOMAIN" >&2 && exit 1
+
+    # Grant user power to acme:acme team in Kleides.
+    # Grant *-keystone:SSO-login to said user in Kleides.
+    user=$1
+    email=$2
+    domain=$3  # sudomain
+
+    openstack="openstack --os-cloud sysadmin"
+
+    echo "Creating (passwordless) user $user on domain $domain"
+    $openstack user create --domain "$domain" "$user" --email "$email"
+
+    echo "Adding to all *-admins groups"
+    $openstack group list --long -f csv --quote none |
+    awk -F, '{if(substr($2,index($2,"-"))=="-admins"){print $2 " " $3}}' |
+    while read line; do group=${line% *}; group_domain=${line#* };
+        echo "- $group ($group_domain)"
+        $openstack group add user --group-domain "$group_domain" "$group" \
+            --user-domain "$domain" "$user"
+    done
+
+
+Federation/IDP/OIDC and user mapping
+------------------------------------
+
+We don't use Federated users, as granting permissions to outside the
+Federated domain did not as we would like. Using type=local users
+instead.
+
+Example user mapping config in: `<ossobv_kleides_mapping.yaml>`_
 
 
 Upgrading keystone
 ------------------
 
-First: database backup
-
-Then: ``keystone-manage db_sync``
+1. database backup
+2. ``keystone-manage db_sync``
