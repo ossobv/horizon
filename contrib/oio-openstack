@@ -1,0 +1,121 @@
+#!/bin/sh -eu
+# vim: set ts=8 sw=4 sts=4 et ai:
+openstack="openstack --os-cloud ossoio-admin" # ~/.config/openstack/clouds.yaml
+su_domain=osso          # "cloud admin" domain
+su_group=osso-admins    # group with only cloud admin (super)user members
+
+
+case ${1:-} in
+
+su-assign)
+    # Show how to turn a user into a superuser:
+    echo "Let the user join group '$su_group@$su_domain':"
+    echo '#'$openstack' role add admin --user $USER --group $ADMINS_GROUP'
+    echo '#'$openstack' role add admin --user johndoe --group '$su_group
+    ;;
+
+su-list)
+    # List superusers:
+    $openstack user list --group $su_group --domain $su_domain -f value |
+        LC_ALL=C sort -k2
+    ;;
+
+su-list-visible)
+    # List everyone who has project permissions outside their domain:
+    openstack --os-cloud ossoio-admin role assignment list \
+      --role admin --effective --names -f csv --quote none |
+      awk -F, '{if(NR!=1&&$4!=""){
+        ulen=split($2,user,"@");plen=split($4,project,"@");
+        if(user[ulen]!=project[plen])print $2}}' | LC_ALL=C sort -u |
+          sed -e 's/^\(.*\)@\([^@]*\)/[udom=\2]\t\1/'
+    ;;
+
+group-list)
+    # List all domains and groups:
+    echo "Domains:"
+    $openstack domain list
+    echo
+    echo "Groups:"
+    $openstack group list --long
+    echo
+    ;;
+
+dagroup-assign)
+    # Show how to turn a group into domain group:
+    echo 'Make the existing group admin for the domain:'
+    echo '#'$openstack' role add admin --domain $DOMAIN --group $ADMINS_GROUP'
+    echo '#'$openstack' role add admin --domain acme --group acme-admins'
+    ;;
+
+dagroup-assign-su)
+    # Update all superusers, making them a member of the domain groups:
+    echo "Adding all superusers to all domain admin groups:"
+
+    echo -n '  ( loading superusers: ' >&2
+    su_users=$(
+        $openstack user list --group $su_group \
+          --domain $su_domain -f value | LC_ALL=C sort -k2)
+    echo $(echo "$su_users" | awk '{print $2}') ')' >&2
+
+    echo -n '  ( loading domain admin groups: ' >&2
+    da_groups=$(
+        openstack --os-cloud ossoio-admin \
+        role assignment list --role admin --names -f csv --quote none |
+        awk -F, '{if($1=="admin"&&$3!=""&&$5!=""){print $3}}' |
+        LC_ALL=C sort)
+    echo $da_groups ')' >&2
+
+    for line in $da_groups; do
+        gname=${line%@*}
+        gdom=${line#*@}
+        has_users=$(\
+            $openstack user list --group $gname -f value)
+        echo "$su_users" | while read -r line; do
+            uid=${line% *}
+            user=${line#* }
+            echo "$has_users" | grep -q $uid && continue
+            echo "- $gname@$gdom += $user"  # hope that gname is unique
+            $openstack group add user $gname $uid
+        done
+    done
+    echo '  ( done )' >&2
+    ;;
+
+dagroup-list)
+    # List all domain admin groups:
+    openstack --os-cloud ossoio-admin \
+        role assignment list --role admin --names -f csv --quote none |
+        sed -e 's/7c9811e4a65d8f5949/../g' |
+        awk -F, 'function rindex(str,search,pos,res){
+           do{res=index(substr(str,pos+1),search);pos+=res;}while(res>=1);
+           return pos;}
+          {if($1=="admin"&&$3!=""&&$5!=""){gdi=rindex($3,"@",1,0);
+              printf "%-23s %-23s %s\n",("[dom=" $5 "]"),substr($3,1,gdi-1),("[gdom=" substr($3,gdi+1) "]");}}' |
+        LC_ALL=C sort
+    ;;
+
+dagroup-update-projects)
+    # Update all projects, giving admin access to the respective admin group:
+    echo 'TODO/FIXME..'
+    ;;
+
+*)
+    cat >&2 << EOF
+Usage: oio-openstack COMMAND
+
+COMMAND must be one of:
+
+  su-assign         # show how to upgrade a user to superuser
+  su-list           # list superusers
+  su-list-visible   # list apparent superusers (check for unexpected perms)
+
+  group-list        # list domains and groups
+
+  dagroup-assign    # show how to upgrade a group to a domain admin group
+  dagroup-assign-su # assign domain admin perms to all su's (run after assign)
+  dagroup-list      # list domain admin groups
+
+EOF
+    exit 1
+    ;;
+esac

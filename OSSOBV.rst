@@ -164,28 +164,10 @@ These implied roles have to be fixed if you happen to delete the
 existing roles.
 
 
-Domain admin conventions
-------------------------
+Creating cloud admins / superusers
+----------------------------------
 
-* Create domain ``acme`` and group ``acme-admins``.
-* Place every admin in the ``acme-admins`` group.
-* Create projects, and make sure all projects give ``admin`` roles to
-  the ``acme-admins`` group.
-* Make the ``acme-admins`` a group admin, using the CLI::
-
-    openstack --os-cloud sysadmin \
-      role add admin --group acme-admins --group-domain acme \
-      --domain acme
-
-* Domain admins may now be added to the ``acme-admins`` group. Giving
-  them domain admin access.
-* Now, if you want *sysadmin* access from the Horizon dashboard to the
-  containers, you'll need to give all sysadmins permissions to the
-  ``acme-admins`` group. A bit tedious, but it works::
-
-    openstack --os-cloud sysadmin group add user acme-admins sysadmin
-
-* Give system scope to the ``sudomain-admins``, so all members get SU powers::
+Give system scope to the ``sudomain-admins``, so all members get SU powers::
 
     $ openstack --os-cloud sysadmin role assignment list --names --system=all
     +-------+---------------+----------------------+------+-----+-----+
@@ -195,45 +177,52 @@ Domain admin conventions
     | admin |               | sudomain-admins@acme |      |     | all |
     +-------+---------------+----------------------+------+-----+-----+
 
+Others don't need system scope at this point.
 
-Creating superusers
--------------------
 
-Use this script to create users that can access all projects::
+Domain admin conventions
+------------------------
 
-    #!/bin/sh -e
-    ( test -z "$1" || test -z "$2" || test -z "$3" ) &&
-        echo "Usage: $0 SU_USERNAME SU_EMAIL SU_DOMAIN" >&2 && exit 1
+* Create domain ``acme`` and group ``acme-admins``.
+* Make the ``acme-admins`` a group admin, using the CLI::
 
-    # Grant user power to acme:acme team in Kleides.
-    # Grant *-keystone:SSO-login to said user in Kleides.
-    user=$1
-    email=$2
-    domain=$3  # sudomain
+    openstack --os-cloud sysadmin \
+      role add admin --group acme-admins --group-domain acme \
+      --domain acme
 
-    openstack="openstack --os-cloud sysadmin"
+    # see: contrib/oio-openstack dagroup-assign
 
-    echo "Creating (passwordless) user $user on domain $domain"
-    $openstack user create --domain "$domain" "$user" --email "$email"
+* Now, if you want *sysadmin* access from the Horizon dashboard to the
+  containers, you'll need to give all sysadmins permissions to the
+  ``acme-admins`` group::
 
-    echo "Adding to all *-admins groups"
-    $openstack group list --long -f csv --quote none |
-    awk -F, '{if(substr($2,index($2,"-"))=="-admins"){print $2 " " $3}}' |
-    while read line; do group=${line% *}; group_domain=${line#* };
-        echo "- $group ($group_domain)"
-        $openstack group add user --group-domain "$group_domain" "$group" \
-            --user-domain "$domain" "$user"
+    for su in sysadmin1 sysadmin2 sysadmin3; do
+      openstack --os-cloud sysadmin group add user acme-admins $su
     done
+
+    # see: contrib/oio-openstack dagroup-assign-su
+
+* Users from the new domain can now be made domain admin by adding them
+  to the ``acme-admins`` group.
+* When creating projects in the ``acme`` domain, make sure all projects
+  assign ``admin`` role to the ``acme-admins`` group.
 
 
 Federation/IDP/OIDC and user mapping
 ------------------------------------
 
 We don't use Federated users, as granting permissions to outside the
-Federated domain did not as we would like. Using type=local users
+Federated domain did not work as we would like. Using type=local users
 instead.
 
-Example user mapping config in: `<ossobv_kleides_mapping.yaml>`_
+Adding domains/users to Kleides:
+
+* See the eample user mapping config in: `<ossobv_kleides_mapping.yaml>`_
+* Wipe passwords of Kleides users so they cannot log in the regular way::
+
+    openstack --os-cloud sysadmin user set johndoe --password ''
+
+* Add appropriate Team to user, and the right SSO-login perms.
 
 
 Upgrading keystone
