@@ -17,8 +17,15 @@ RUN set -x && \
     apt-get -qy dist-upgrade && \
     apt-get install -y $build $libs $tools && \
     pip3 install --no-cache-dir -U pip idna six && \
-    pip3 install --no-cache-dir -r /tmp/requirements.txt && \
-    pip3 install --no-cache-dir 'django-redis>=4.10.0' && \
+    # Don't forget the pip --constraints file; see tox.ini and
+    # https://review.opendev.org/#/c/693000/ and
+    # http://lists.openstack.org/pipermail/openstack-discuss/2019-November/011283.html
+    pip3 install --no-cache-dir \
+      -c https://releases.openstack.org/constraints/upper/train \
+      -r /tmp/requirements.txt && \
+    pip3 install --no-cache-dir \
+      -c https://releases.openstack.org/constraints/upper/train \
+      'django-redis>=4.10.0' && \
     /tmp/venvpatch /tmp/patches --apply && \
     pip3 freeze && \
     apt-get -qy remove --purge $build && apt-get -qy autoremove --purge && \
