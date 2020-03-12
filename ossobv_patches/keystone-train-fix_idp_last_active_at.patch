@@ -1,0 +1,28 @@
+From a7b4fff8481cef0d86d6c28615f1032fdc4abcd8 Mon Sep 17 00:00:00 2001
+From: Walter Doekes <walter+github@wjd.nu>
+Date: Thu, 12 Mar 2020 16:34:43 +0100
+Subject: [PATCH] Also record last_active_at for local users using IdP to log in
+
+If a user tries to log in after disable_user_account_days_inactive days,
+the login is denied with 401, the log showing a "User is disabled".
+
+Before this changeset, local users using an federated identity for login
+did not get an updated last_active_at. Hence the login was denied 90
+after account setup.
+
+Change-Id: I7dd0db1135898c4098093f54d759ff2384bf7714
+(cherry-picked from commit 76a8322a90122bafde7800cfc6807f1be1dc16ce)
+---
+
+diff --git a/keystone/auth/plugins/mapped.py b/keystone/auth/plugins/mapped.py
+index 5f568a8..4f610e2 100644
+--- a/keystone/auth/plugins/mapped.py
++++ b/keystone/auth/plugins/mapped.py
+@@ -273,6 +273,7 @@
+                 user, mapped_properties, identity_provider, protocol)
+         else:
+             response_data = build_local_user_context(mapped_properties)
++            PROVIDERS.shadow_users_api.set_last_active_at(response_data['user_id'])
+ 
+     except Exception:
+         # NOTE(topol): Diaper defense to catch any exception, so we can
