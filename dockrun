@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 
 # Has already been done. Unsure if we should rerun it here.
 time python3 /app/manage.py collectstatic --noinput -v0
