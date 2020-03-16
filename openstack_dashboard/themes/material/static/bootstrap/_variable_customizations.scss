@@ -2,7 +2,12 @@
 //
 //## Gray and brand colors for use across Bootstrap.
 
-$brand-primary:         #f2f4ea; // #BCAE74; // OSSOBV colors
+$osso-brown-dark:       #61573b;
+$osso-brown-light:      #bcae74;
+$osso-pale-gray:        #f2f4ea;
+
+//$brand-primary:         #00897b; // default blue
+$brand-primary:         $osso-brown-dark; // too dark for title bar
 
 // If that blue isn't desired, then consider any of these other
 //colors that are part of the Material Design Spec Color Palette
@@ -11,7 +16,13 @@ $brand-primary:         #f2f4ea; // #BCAE74; // OSSOBV colors
 //$brand-primary:         #455a64;
 //$brand-primary:         #009688;
 
-$gray-dark:             #212121;
+//$gray-dark:             #212121;
+
+$gray-darker:           #1a1710; // even darker
+$gray-dark:             #3d3725; // darker
+$gray:                  $osso-brown-dark;
+$gray-light:            $osso-brown-light;
+$gray-lighter:          $osso-pale-gray;
 
 
 //== Iconography
@@ -36,25 +47,20 @@ $icon-font-svg-id:        "material";
 
 // Inverted navbar
 // Inverted navbar links
-$navbar-inverse-link-color:                 #61573b;
-$navbar-inverse-link-hover-color:           $navbar-inverse-link-color;
+$navbar-inverse-link-color:         $osso-brown-dark;
+$navbar-inverse-link-hover-color:   $navbar-inverse-link-color;
+$navbar-inverse-bg:                 $osso-pale-gray;
+
+// Left navbar
+$list-group-link-heading-color:     $osso-brown-dark;
+// Breadcrumb bg
+$breadcrumb-bg:                     $osso-pale-gray;
 
 // Inverted navbar brand label
 $navbar-inverse-brand-hover-color:          $navbar-inverse-link-color;
 
 // Inverted Navbar toggle
 $navbar-inverse-toggle-icon-bar-bg:         $navbar-inverse-link-color;
-
-//== Links and buttons
-
-$btn-default-color:                         #61573b !default;
-$link-color:                                $btn-default-color;
-$navbar-default-color:                      $btn-default-color;
-$navbar-inverse-toggle-hover-bg:            $btn-default-color;
-$navbar-inverse-toggle-border-color:        $btn-default-color;
-$list-group-link-heading-color:             $btn-default-color;
-$kbd-bg:                                    $btn-default-color;
-$btn-primary-color:                         $btn-default-color;
 
 //== Navs
 //
