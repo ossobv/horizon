@@ -74,3 +74,11 @@ RUN set -x && \
 
 # Run uwsgi as www-data, after some bootstrapping
 CMD ["/app/dockrun"]
+
+# Example local docker run in _local.sh:
+#
+# docker run -d --rm --name horizon_redis redis
+# trap 'docker stop horizon_redis' EXIT
+# docker run --rm --name horizon --link horizon_redis \
+#   -v `pwd`/_local.py:/app/openstack_dashboard/local/local_settings.d/local.py \
+#   -p 8000:8080 -it tmp
