@@ -32,14 +32,14 @@ RUN set -x && \
     # http://lists.openstack.org/pipermail/openstack-discuss/2019-November/011283.html
     pip3 install --no-cache-dir \
       --ignore-installed \
-      -c https://releases.openstack.org/constraints/upper/train \
+      -c https://releases.openstack.org/constraints/upper/ussuri \
       -r /tmp/requirements.txt && \
     # We need a cache backend, one of these:
     # #django-redis>=4.10.0
     # #python-memcached>=1.59
     pip3 install --no-cache-dir \
       --ignore-installed \
-      -c https://releases.openstack.org/constraints/upper/train \
+      -c https://releases.openstack.org/constraints/upper/ussuri \
       'django-redis>=4.10.0' && \
     # Apply custom patches.
     /tmp/venvpatch /tmp/patches --apply && \
@@ -49,7 +49,7 @@ RUN set -x && \
     # Double check =) should yield nothing, even after we autoremoved,
     # as we installed with --ignore-installed.
     pip3 install --no-cache-dir \
-      -c https://releases.openstack.org/constraints/upper/train \
+      -c https://releases.openstack.org/constraints/upper/ussuri \
       -r /tmp/requirements.txt && \
     pip3 freeze
 
