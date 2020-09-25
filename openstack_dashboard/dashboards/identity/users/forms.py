@@ -208,7 +208,7 @@ class CreateUserForm(PasswordMixin, BaseUserForm, AddExtraColumnMixIn):
             messages.error(request, msg)
             return False
         except Exception as exc:
-            LOG.warn('Creating user failed: %s', exc)
+            LOG.warning('Creating user failed: %s', exc)
             response = exceptions.handle(request, ignore=True)
             match = re.match((r'The password does not match the '
                               r'requirements:(.*?) [(]HTTP 400[)]'), str(exc),
@@ -289,7 +289,7 @@ class UpdateUserForm(BaseUserForm, AddExtraColumnMixIn):
             messages.error(request, msg)
             return False
         except Exception as exc:
-            LOG.warn('Updating user failed: %s', exc)
+            LOG.warning('Updating user failed: %s', exc)
             response = exceptions.handle(request, ignore=True)
             messages.error(request, _('Unable to update the user.'))
 
@@ -346,7 +346,7 @@ class ChangePasswordForm(PasswordMixin, forms.SelfHandlingForm):
             messages.success(request,
                              _('User password has been updated successfully.'))
         except Exception as exc:
-            LOG.warn('Updating password failed: %s', exc)
+            LOG.warning('Updating password failed: %s', exc)
             response = exceptions.handle(request, ignore=True)
             match = re.match((r'The password does not match the '
                               r'requirements:(.*?) [(]HTTP 400[)]'), str(exc),
