@@ -56,7 +56,7 @@ RUN set -x && \
 # TODO: automate this? git describe --always
 # Fixes: "Error: Unable to retrieve version information."
 # (pbr.version is picky, so we'll just put 16.1.0 in there)
-ENV PBR_VERSION=16.1.0 PBR_VERSION_REMAINDER=osso14
+ENV PBR_VERSION=18.3.2 PBR_VERSION_REMAINDER=osso29
 # Copy application and contrib scripts.
 COPY . /app/
 
