@@ -376,6 +376,9 @@ COMPRESS_OFFLINE = True
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = 'user'  # user exists, but has no perms
 OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True
 
+# Our ingress load balancer sets this correctly.
+SECURE_PROXY_ADDR_HEADER = 'HTTP_X_FORWARDED_FOR'
+
 # OSSBV theming:
 AVAILABLE_THEMES = [
     (
