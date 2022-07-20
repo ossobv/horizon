@@ -10,6 +10,12 @@ whether fixes are appropriate for upstream inclusion.*
 That being said, let's dive in:
 
 
+OSSO B.V. edits of related projects
+-----------------------------------
+
+Also check the `related (Keystone?) patches <./ossobv_patches/>`_.
+
+
 Logging
 -------
 

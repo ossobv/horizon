@@ -2,7 +2,7 @@
 Horizon (OpenStack Dashboard)
 =============================
 
-*OSSO B.V. edited -- see OSSOBV.rst for more info*
+*OSSO B.V. edited -- see* `OSSOBV.rst <./OSSOBV.rst>`_ *for more info*
 
 Horizon is a Django-based project aimed at providing a complete OpenStack
 Dashboard along with an extensible framework for building new dashboards
