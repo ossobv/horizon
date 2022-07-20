@@ -1,0 +1,36 @@
+Description: add redis-sentinel support
+Author: Alex Boonstra
+
+Usage:
+
+  [cache]
+  enabled = true
+  backend = dogpile.cache.redis_sentinel
+  backend_argument = sentinels:IP1:26379,IP2:26379,IP3:26379
+  backend_argument = service_name:keystone  # sentinel master-name
+
+--- a/dogpile/cache/backends/redis.py	2022-01-11 21:50:22.219205829 +0100
++++ b/dogpile/cache/backends/redis.py	2022-01-11 21:49:44.003058988 +0100
+@@ -269,7 +269,11 @@
+     def __init__(self, arguments):
+         arguments = arguments.copy()
+ 
+-        self.sentinels = arguments.pop("sentinels", None)
++        sentinels = arguments.pop("sentinels", None)
++        # The 'sentinels' argument is a comma separated string of host:port.
++        # This piece of code expects a list of lists though. Lets make it so.
++        self.sentinels = [s.split(':') for s in sentinels.split(',')]
++
+         self.service_name = arguments.pop("service_name", "mymaster")
+         self.sentinel_kwargs = arguments.pop("sentinel_kwargs", {})
+         self.connection_kwargs = arguments.pop("connection_kwargs", {})
+--- a/oslo_cache/_opts.py	2022-01-11 21:51:51.651547591 +0100
++++ b/oslo_cache/_opts.py	2022-01-11 21:52:00.907582825 +0100
+@@ -44,6 +44,7 @@
+                             'dogpile.cache.bmemcached',
+                             'dogpile.cache.dbm',
+                             'dogpile.cache.redis',
++                            'dogpile.cache.redis_sentinel',
+                             'dogpile.cache.memory',
+                             'dogpile.cache.memory_pickle',
+                             'dogpile.cache.null'],
