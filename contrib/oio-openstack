@@ -1,23 +1,23 @@
 #!/bin/sh -eu
 # vim: set ts=8 sw=4 sts=4 et ai:
-openstack="openstack --os-cloud ossoio-admin" # ~/.config/openstack/clouds.yaml
-su_domain=osso          # "cloud admin" domain
-su_group=osso-admins    # group with only cloud admin (super)user members
+openstack="openstack --os-cloud ossoio-admin"  # ~/.config/openstack/clouds.yaml
+super_su_group=osso-admins  # "cloud admin" domain
+super_su_domain=osso  # group with only cloud admin (super)user members
 
 
 case ${1:-} in
 
 su-assign)
     # Show how to turn a user into a superuser:
-    echo "Let the user join group '$su_group@$su_domain':"
+    echo "Let the user join group '$super_su_group@$super_su_domain':"
     echo '#'$openstack' role add admin --user $USER --group $ADMINS_GROUP'
-    echo '#'$openstack' role add admin --user johndoe --group '$su_group
+    echo '#'$openstack' role add admin --user johndoe --group '$super_su_group
     ;;
 
 su-list)
     # List superusers:
-    $openstack user list --group $su_group --domain $su_domain -f value |
-        LC_ALL=C sort -k2
+    $openstack user list --group $super_su_group \
+          --domain $super_su_domain -f value | LC_ALL=C sort -k2
     ;;
 
 su-list-visible)
@@ -52,9 +52,16 @@ dagroup-assign-su)
     echo "Adding all superusers to all domain admin groups:"
 
     echo -n '  ( loading superusers: ' >&2
+    super_su_group_id=$(
+        $openstack group list --domain $super_su_domain -f csv --quote none |
+        awk -F, -vG="$super_su_group" '$2==G{print $1}')
+    if test -z "$super_su_group_id"; then
+        echo "no group_id for $super_su_group in $super_su_domain" >&2
+        exit 1
+    fi
     su_users=$(
-        $openstack user list --group $su_group \
-          --domain $su_domain -f value | LC_ALL=C sort -k2)
+        $openstack user list --group "$super_su_group_id" \
+          -f value | LC_ALL=C sort -k2)
     echo $(echo "$su_users" | awk '{print $2}') ')' >&2
 
     echo -n '  ( loading domain admin groups: ' >&2
@@ -69,13 +76,13 @@ dagroup-assign-su)
         gname=${line%@*}
         gdom=${line#*@}
         has_users=$(\
-            $openstack user list --group $gname -f value)
+            $openstack user list --group "$gname" -f value)
         echo "$su_users" | while read -r line; do
             uid=${line% *}
             user=${line#* }
-            echo "$has_users" | grep -q $uid && continue
+            echo "$has_users" | grep -q "$uid" && continue
             echo "- $gname@$gdom += $user"  # hope that gname is unique
-            $openstack group add user $gname $uid
+            $openstack group add user "$gname" "$uid"
         done
     done
     echo '  ( done )' >&2
