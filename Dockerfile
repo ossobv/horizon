@@ -1,4 +1,5 @@
-FROM ossobv/uwsgi-python:3
+# Ubuntu/Focal
+FROM ossobv/uwsgi-python:3.8
 
 # This rarely changes (moved to front)
 ARG DEBIAN_FRONTEND=noninteractive
@@ -12,7 +13,9 @@ COPY venvpatch /tmp/venvpatch
 
 RUN set -x && \
     build="python3-pip" && libs="" && tools="patch" && \
-    ln -s /usr/bin/python3 /usr/bin/python && \
+    sed -e 's@security.ubuntu.com/ubuntu@apt.osso.nl/ubuntu-security@' \
+        -e 's@archive.ubuntu.com@apt.osso.nl@' \
+        -i /etc/apt/sources.list /etc/apt/sources.list.d/* && \
     apt-get -q update && \
     apt-get -qy dist-upgrade && \
     apt-get install -y $build $libs $tools && \
